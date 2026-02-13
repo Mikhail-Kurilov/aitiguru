@@ -13,6 +13,7 @@ interface LoginFormData {
   username: string;
   email?: string;
   password: string;
+  remember: boolean;
 }
 
 interface LoginResponse {
@@ -21,9 +22,10 @@ interface LoginResponse {
 }
 
 
-const saveTokens = (accessToken: string, refreshToken: string) => {
-  localStorage.setItem('userToken', accessToken);
-  localStorage.setItem('refreshToken', refreshToken);
+const saveTokens = (accessToken: string, refreshToken: string, remember: boolean) => {
+  const storage = remember ? localStorage : sessionStorage;
+  storage.setItem('userToken', accessToken);
+  storage.setItem('refreshToken', refreshToken);
 };
 
 const fetchMe = async (token: string) => {
@@ -34,9 +36,7 @@ const fetchMe = async (token: string) => {
     },
     credentials: 'include',
   });
-
   if (!res.ok) throw new Error('Failed to fetch user');
-
   return res.json();
 };
 
@@ -45,10 +45,9 @@ const fetchMe = async (token: string) => {
 const useAuthMutations = () => {
   const navigate = useNavigate();
 
-  const handleAuthSuccess = async (data: LoginResponse, message: string) => {
+  const handleAuthSuccess = async (data: LoginResponse, message: string, remember: boolean) => {
     const { accessToken, refreshToken } = data;
-    saveTokens(accessToken, refreshToken);
-
+    saveTokens(accessToken, refreshToken, remember);
     try {
       const user = await fetchMe(accessToken);
       console.log('Logged in user:', user);
@@ -79,10 +78,9 @@ const useAuthMutations = () => {
         const error = await res.json();
         throw new Error(error.message || 'Login failed');
       }
-
       return res.json();
     },
-    onSuccess: (data) => handleAuthSuccess(data, 'Вы залогировались! 😊'),
+    onSuccess: (data,variables) => handleAuthSuccess(data, 'Вы залогировались! 😊', variables.remember),
     onError: (error) => toast.error(error.message || 'Ошибка. Попробуйте снова!'),
   });
 
@@ -93,9 +91,7 @@ const useAuthMutations = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
-
       if (!res.ok) throw new Error('Registration failed');
-
       return res.json();
     },
     onSuccess: async (_, variables) => {
@@ -103,6 +99,7 @@ const useAuthMutations = () => {
       loginMutation.mutate({
         username: variables.username,
         password: variables.password,
+        remember: variables.remember,
       });
     },
     onError: (error) => toast.error(error.message || 'Ошибка регистрации'),
@@ -133,12 +130,12 @@ const LoginForm: React.FC = () => {
   const { login, register, resetPassword, isLoading } = useAuthMutations();
 
   const { control, handleSubmit, formState: { errors }, watch } = useForm<LoginFormData>({
-    defaultValues: { username: '', email: '', password: '' },
+    defaultValues: { username: '', email: '', password: '', remember: false },
     mode: 'onSubmit',
     reValidateMode: 'onChange',
   });
 
-  const emailValue = watch('email');
+  const usernameValue = watch('username');
 
   const toggleVariant = useCallback(() => {
     setVariant((current) => (current === 'LOGIN' ? 'REGISTER' : 'LOGIN'));
@@ -153,16 +150,16 @@ const LoginForm: React.FC = () => {
   };
 
   const handleResetPassword = () => {
-    if (!emailValue) {
-      toast.error('Сначала введите ваш email 😊');
+    if (!usernameValue) {
+      toast.error('Сначала введите имя пользователя 😊');
       return;
     }
-    resetPassword(emailValue);
+    resetPassword(usernameValue);
   };
 
 
   const inputClasses = "w-full pl-8 pr-2 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-400";
-  const labelClasses = "block text-sm font-medium text-gray-800 mb-1 text-left";
+  const labelClasses = "block text-md font-medium text-gray-800 mb-1 text-left";
   const errorClasses = "text-red-500 text-xs mt-1";
 
   return (
@@ -253,6 +250,23 @@ const LoginForm: React.FC = () => {
             />
           </div>
           {errors.password && <span className={errorClasses}>{errors.password.message}</span>}
+        </div>
+
+        <div className="flex items-center gap-2 text-gray-400">
+          <Controller
+            name="remember"
+            control={control}
+            render={({field}) => (
+              <input
+                type="checkbox"
+                id="remember"
+                className="h-5 w-5"
+                checked={field.value}
+                onChange={(e) => field.onChange(e.target.checked)}
+              />
+            )}
+          />
+          <label htmlFor="remember">Запомнить данные</label>
         </div>
 
         <button
