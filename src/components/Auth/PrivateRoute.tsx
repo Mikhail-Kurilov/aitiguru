@@ -1,6 +1,6 @@
 import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import isLoggedIn from "./auth";
+import { isLoggedIn } from "./auth";
 
 interface PrivateRouteProps {
   children: React.ReactNode;

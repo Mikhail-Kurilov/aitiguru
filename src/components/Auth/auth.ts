@@ -1,6 +1,16 @@
-const isLoggedIn = () => {
-  const token = localStorage.getItem("token");
-  return token !== null;
+export const getAccessToken = () => {
+  return localStorage.getItem('userToken');
 };
 
-export default isLoggedIn;
+export const getRefreshToken = () => {
+  return localStorage.getItem('refreshToken');
+};
+
+export const isLoggedIn = () => {
+  return !!getAccessToken();
+};
+
+export const logout = () => {
+  localStorage.removeItem('userToken');
+  localStorage.removeItem('refreshToken');
+};
