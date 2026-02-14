@@ -29,7 +29,6 @@ export const refreshAccessToken = async () => {
   const res = await fetch('https://dummyjson.com/auth/refresh', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
     body: JSON.stringify({
       refreshToken: storedRefreshToken,
       expiresInMins: 30,

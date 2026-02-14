@@ -34,7 +34,6 @@ const fetchMe = async (token: string) => {
     headers: {
       Authorization: `Bearer ${token}`,
     },
-    credentials: 'include',
   });
   if (!res.ok) throw new Error('Failed to fetch user');
   return res.json();
@@ -66,14 +65,13 @@ const useAuthMutations = () => {
       const res = await fetch('https://dummyjson.com/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({
           username: data.username,
           password: data.password,
           expiresInMins: 30,
         }),
       });
-
+      console.log('Login response:', res);
       if (!res.ok) {
         const error = await res.json();
         throw new Error(error.message || 'Login failed');
@@ -231,10 +229,10 @@ const LoginForm: React.FC = () => {
                 required: 'Введите пароль!',
                 minLength: { value: 6, message: 'Пароль должен содержать минимум 6 символов! 😊' },
                 maxLength: { value: 20, message: 'Пароль должен содержать максимум 20 символов! 😊'},
-                pattern: {
-                  value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,20}$/,
-                  message: 'Пароль должен содержать буквы и цифры',
-                }
+                // pattern: {
+                //   value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,20}$/,
+                //   message: 'Пароль должен содержать буквы и цифры',
+                // }
               }}
               render={({ field: { onChange, onBlur, value } }) => (
                 <input

@@ -1,6 +1,5 @@
-import { Suspense, lazy, useEffect, useState, useRef } from "react";
+import { Suspense, lazy } from "react";
 import { Loading } from "../../components/index";
-import { useForm, useWatch } from "react-hook-form";
 
 
 const Goods = lazy(() => import("../../components/Goods/Goods"));

@@ -1,18 +1,17 @@
-export interface ApiError {
-  status: number;
-  message: string;
-  code?: string;
-  details?: Record<string, unknown>;
+export interface Product {
+  id: number;
+  title: string;
+  description: string;
+  brand: string;
+  sku: string;
+  rating: number;
+  price: number;
+  thumbnail: string;
 }
 
-export interface ErrorResponse {
-  success: false;
-  error: ApiError;
+export interface ProductsResponse {
+  products: Product[];
+  total: number;
+  skip: number;
+  limit: number;
 }
-
-export interface SuccessResponse<T> {
-  success: true;
-  data: T;
-}
-
-export type ApiResponse<T> = ErrorResponse | SuccessResponse<T>;
