@@ -1,12 +1,12 @@
-import type {Product} from "../../constants/types";
+import type {Product} from "../../../constants/types";
 
 interface Props {
   products: Product[];
 }
 
-const GoodsTable: React.FC<Props> = ({ products }) => {
+const ProductsTable: React.FC<Props> = ({ products }) => {
   return (
-    <table className="w-full border-collapse mt-6">
+    <table className="w-full border-collapse p-6">
       <thead>
       <tr className="bg-gray-100 text-left">
         <th className="p-3">
@@ -69,4 +69,4 @@ const GoodsTable: React.FC<Props> = ({ products }) => {
   );
 };
 
-export default GoodsTable;
+export default ProductsTable;

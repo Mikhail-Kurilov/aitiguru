@@ -1,15 +1,14 @@
 import { Suspense, lazy } from "react";
 import { Loading } from "../../components/index";
 
-
-const Goods = lazy(() => import("../../components/Goods/Goods"));
+const Products = lazy(() => import("../../features/products/Products"));
 
 const Content = () => {
 
   return (
     <>
       <Suspense fallback={<Loading />}>
-        <Goods />
+        <Products />
       </Suspense>
     </>
   );

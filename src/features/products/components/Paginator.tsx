@@ -1,3 +1,5 @@
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
+
 interface Props {
   total: number;
   currentPage: number;
@@ -16,12 +18,14 @@ const Paginator: React.FC<Props> = ({
   return (
     <div className="flex justify-between items-center mt-6">
       <div>
-        Показано {(currentPage - 1) * limit + 1}-
-        {Math.min(currentPage * limit, total)} из {total}
+        <span className="text-gray-500">Показано</span>{" "}
+        {(currentPage - 1) * limit + 1}-
+        {Math.min(currentPage * limit, total)}{" "}
+        <span className="text-gray-500">из</span> {total}
       </div>
-
       <div className="flex gap-2">
-        {Array.from({ length: totalPages }, (_, i) => (
+        <button onClick={() => onPageChange(currentPage - 1)} className="text-2xl text-gray-500 cursor-pointer"><MdKeyboardArrowLeft/></button>
+        {Array.from({length: totalPages}, (_, i) => (
           <button
             key={i}
             onClick={() => onPageChange(i + 1)}
@@ -34,6 +38,7 @@ const Paginator: React.FC<Props> = ({
             {i + 1}
           </button>
         ))}
+        <button onClick={() => onPageChange(currentPage + 1)} className="text-2xl text-gray-500 cursor-pointer"><MdKeyboardArrowRight/></button>
       </div>
     </div>
   );
