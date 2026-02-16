@@ -1,12 +1,16 @@
-import { Login, Content, FortyFour } from "../pages";
-import PrivateRoute from "../components/Auth/PrivateRoute.tsx";
+import FortyFour  from "../features/fortyfour/FortyFour";
+import Login from "../features/login/Login";
+import PrivateRoute from "../features/login/auth/PrivateRoute";
+import {lazy} from "react";
+
+const Products = lazy(() => import("../features/products/Products"));
 
 const routes = [
   {
-    path: "/",
+    path: "/products",
     element: (
       <PrivateRoute>
-        <Content />
+        <Products />
       </PrivateRoute>
     ),
     name: "Content",

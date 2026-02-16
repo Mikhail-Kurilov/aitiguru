@@ -1,72 +1,140 @@
+import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import type {Product} from "../../../constants/types";
+import {ProductRow} from "./ProductRow";
+import { MdArrowUpward, MdArrowDownward } from "react-icons/md";
+import {useProductTableStore} from "../../../stores/productTableStore.ts";
 
 interface Props {
   products: Product[];
 }
 
-const ProductsTable: React.FC<Props> = ({ products }) => {
+const arePropsEqual = (prevProps: Props, nextProps: Props) => {
   return (
-    <table className="w-full border-collapse p-6">
+    prevProps.products === nextProps.products
+  )
+}
+
+const ProductsTable = React.memo( ({ products }: Props) => {
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const selectAllRef = useRef<HTMLInputElement>(null);
+
+  const allSelected =
+    products.length > 0 &&
+    products.every(product => selectedIds.has(product.id));
+
+  const isIndeterminate =
+    products.some(product => selectedIds.has(product.id)) &&
+    !allSelected;
+
+  const { sortField, sortOrder, setSort } = useProductTableStore();
+
+  useEffect(() => {
+    if (selectAllRef.current) {
+      selectAllRef.current.indeterminate = isIndeterminate;
+    }
+  }, [isIndeterminate]);
+
+  const handleToggle = useCallback((id: number) => {
+    setSelectedIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  }, []);
+
+  const handleSelectAll = useCallback(() => {
+    setSelectedIds(prev => {
+      const newSet = new Set(prev);
+      const allSelected = products.every(p => newSet.has(p.id));
+      if (allSelected) {
+        products.forEach(p => newSet.delete(p.id));
+      } else {
+        products.forEach(p => newSet.add(p.id));
+      }
+      return newSet;
+    });
+  }, [products]);
+
+  const handleSort = (field: 'brand' | 'sku' | 'rating' | 'price') => {
+    setSort(field);
+  };
+
+  const sortedProducts = useMemo(() => {
+    if (!sortField) return products;
+
+    return [...products].sort((a, b) => {
+      let valA = a[sortField];
+      let valB = b[sortField];
+      if (sortField === 'rating' || sortField === 'price') {
+        // Числовая сортировка
+        return sortOrder === 'asc' ? (valA as number) - (valB as number) : (valB as number) - (valA as number);
+      } else {
+        // Строковая сортировка (brand, sku)
+        valA = (valA as string) || '';
+        valB = (valB as string) || '';
+        return sortOrder === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+      }
+    });
+  }, [products, sortField, sortOrder]);
+
+  return (
+    <table className=" table-fixed border-collapse p-6">
       <thead>
-      <tr className="bg-gray-100 text-left">
-        <th className="p-3">
-          <input type="checkbox" />
+      <tr className="text-left">
+        <th className="p-4 w-12">
+          <input
+            ref={selectAllRef}
+            type="checkbox"
+            checked={allSelected}
+            onChange={handleSelectAll}
+            className="w-5 h-5"
+          />
         </th>
-        <th className="p-3">Наименование</th>
-        <th className="p-3">Вендор</th>
-        <th className="p-3">Артикул</th>
-        <th className="p-3">Оценка</th>
-        <th className="p-3">Цена, ₽</th>
-        <th className="p-3"></th>
+        <th className="p-6 w-[550px] text-gray-500">Наименование</th>
+        <th className="p-3 w-[200px] text-gray-500" onClick={() => handleSort('brand')}>
+          <div className="flex items-center justify-center gap-2">
+            <span>Вендор</span>
+            {sortField === 'brand' && (sortOrder === 'asc' ? <MdArrowUpward /> : <MdArrowDownward />)}
+          </div>
+        </th>
+        <th className="p-3 w-[200px] text-gray-500" onClick={() => handleSort('sku')}>
+          <div className="flex items-center justify-center gap-2">
+            <span>Артикул</span>
+            {sortField === 'sku' && (sortOrder === 'asc' ? <MdArrowUpward/> : <MdArrowDownward/>)}
+          </div>
+        </th>
+        <th className="p-3 w-[200px] text-gray-500 text-center" onClick={() => handleSort('rating')}>
+          <div className="flex items-center justify-center gap-2">
+            <span>Оценка</span>
+            {sortField === 'rating' && (sortOrder === 'asc' ? <MdArrowUpward/> : <MdArrowDownward/>)}
+          </div>
+        </th>
+        <th className="p-3 w-[200px] text-gray-500" onClick={() => handleSort('price')}>
+          <div className="flex items-center justify-center gap-2">
+            <span>Цена, ₽</span>
+            {sortField === 'price' && (sortOrder === 'asc' ? <MdArrowUpward/> : <MdArrowDownward/>)}
+          </div>
+        </th>
+        <th className="p-3 w-[200px]"></th>
       </tr>
       </thead>
 
       <tbody>
-      {products.map((product) => (
-        <tr key={product.id} className="border-t">
-          <td className="p-3">
-            <input type="checkbox" />
-          </td>
-
-          <td className="p-3 flex gap-3 items-center">
-            <img
-              src={product.thumbnail}
-              alt={product.title}
-              className="w-12 h-12 object-cover"
-            />
-            <div>
-              <div className="font-medium">
-                {product.title}
-              </div>
-              <div className="text-sm text-gray-500">
-                {product.description}
-              </div>
-            </div>
-          </td>
-
-          <td className="p-3">{product.brand}</td>
-          <td className="p-3">{product.sku}</td>
-          <td className="p-3">
-            {product.rating}/5
-          </td>
-          <td className="p-3">
-            {product.price.toLocaleString("ru-RU")} ₽
-          </td>
-
-          <td className="p-3 flex gap-2">
-            <button className="bg-blue-500 text-white px-3 py-1 rounded-full">
-              +
-            </button>
-
-            <button className="bg-gray-300 px-3 py-1 rounded-full">
-              ...
-            </button>
-          </td>
-        </tr>
+      {sortedProducts.map((product) => (
+        <ProductRow
+          key={product.id}
+          product={product}
+          selected={selectedIds.has(product.id)}
+          onToggle={handleToggle}
+        />
       ))}
       </tbody>
     </table>
   );
-};
+}, arePropsEqual);
 
 export default ProductsTable;

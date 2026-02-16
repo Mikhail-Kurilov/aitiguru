@@ -51,7 +51,7 @@ const useAuthMutations = () => {
       const user = await fetchMe(accessToken);
       console.log('Logged in user:', user);
       toast.success(message);
-      navigate('/');
+      navigate('/products');
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error(error.message);

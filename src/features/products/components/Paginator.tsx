@@ -15,6 +15,22 @@ const Paginator: React.FC<Props> = ({
                                     }) => {
   const totalPages = Math.ceil(total / limit);
 
+  const maxVisible = 5;
+  const half = Math.floor(maxVisible / 2);
+
+  let start = Math.max(1, currentPage - half);
+  let end = start + maxVisible - 1;
+
+  if (end > totalPages) {
+    end = totalPages;
+    start = Math.max(1, end - maxVisible + 1);
+  }
+
+  const pages = [];
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+
   return (
     <div className="flex justify-between items-center mt-6">
       <div>
@@ -23,22 +39,37 @@ const Paginator: React.FC<Props> = ({
         {Math.min(currentPage * limit, total)}{" "}
         <span className="text-gray-500">из</span> {total}
       </div>
+
       <div className="flex gap-2">
-        <button onClick={() => onPageChange(currentPage - 1)} className="text-2xl text-gray-500 cursor-pointer"><MdKeyboardArrowLeft/></button>
-        {Array.from({length: totalPages}, (_, i) => (
+        <button
+          disabled={currentPage === 1}
+          onClick={() => onPageChange(currentPage - 1)}
+          className="text-2xl text-gray-500 disabled:opacity-30"
+        >
+          <MdKeyboardArrowLeft />
+        </button>
+
+        {pages.map(page => (
           <button
-            key={i}
-            onClick={() => onPageChange(i + 1)}
+            key={page}
+            onClick={() => onPageChange(page)}
             className={`px-3 py-1 rounded ${
-              currentPage === i + 1
+              currentPage === page
                 ? "bg-blue-600 text-white"
                 : "bg-gray-200"
             }`}
           >
-            {i + 1}
+            {page}
           </button>
         ))}
-        <button onClick={() => onPageChange(currentPage + 1)} className="text-2xl text-gray-500 cursor-pointer"><MdKeyboardArrowRight/></button>
+
+        <button
+          disabled={currentPage === totalPages}
+          onClick={() => onPageChange(currentPage + 1)}
+          className="text-2xl text-gray-500 disabled:opacity-30"
+        >
+          <MdKeyboardArrowRight />
+        </button>
       </div>
     </div>
   );

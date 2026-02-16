@@ -2,8 +2,9 @@ import './App.css'
 import {Route, Routes} from "react-router-dom";
 import routes from "./constants/routes.tsx";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import {useEffect} from "react";
-import {refreshAccessToken, saveTokens} from "./components/Auth/auth.ts";
+import {Suspense, useEffect} from "react";
+import {refreshAccessToken, saveTokens} from "./features/login/auth/auth.ts";
+import Loading from "./ui/Loading.tsx";
 
 function App() {
 const queryClient = new QueryClient();
@@ -23,13 +24,15 @@ const queryClient = new QueryClient();
   }, []);
 
   return (
-    <main className=" flex flex-grow pt-2 px-4 text-gray-800 rounded shadow-md mx-auto">
+    <main className=" flex flex-grow pt-2 px-4 text-gray-800 rounded shadow-md mx-auto min-w-fit">
       <QueryClientProvider client={queryClient}>
-        <Routes>
-          {routes.map((route, index) => (
-            <Route key={index} path={route.path} element={route.element}/>
-          ))}
-        </Routes>
+        <Suspense fallback={<Loading />}>
+          <Routes>
+            {routes.map((route, index) => (
+              <Route key={index} path={route.path} element={route.element}/>
+            ))}
+          </Routes>
+        </Suspense>
       </QueryClientProvider>
     </main>
   )

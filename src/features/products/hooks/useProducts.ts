@@ -1,14 +1,16 @@
-import {useQuery} from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { getProducts } from "../api/api.ts";
 
-export const useProducts = (params: {
+interface ProductsParams {
   page: number;
   limit: number;
   search: string;
-}) => {
+}
+
+export const useProducts = ({ page, limit, search }: ProductsParams) => {
   return useQuery({
-    initialData: undefined,
-    queryKey: ['products', params],
-    queryFn: () => fetchProducts(params),
-    keepPreviousData: true
+    queryKey: ["products", page, limit, search],
+    queryFn: () => getProducts({ page, limit, search }),
+    placeholderData: (prev) => prev,
   });
 };

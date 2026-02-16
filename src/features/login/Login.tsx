@@ -1,4 +1,4 @@
-import LoginForm from "../../components/Login/LoginForm";
+import LoginForm from "./components/LoginForm";
 import svgUrl from "../../assets/logo.svg"
 
 const Login = () => {
