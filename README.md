@@ -1,73 +1,213 @@
 # React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Products Dashboard
 
-Currently, two official plugins are available:
+Тестовое задание: реализация админ-панели управления товарами с авторизацией и интеграцией с публичным API.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Проект разработан с использованием React 18+ и TypeScript (strict mode).
+Работоспособность проверена в актуальной версии Google Chrome.
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Технологический стек
 
-## Expanding the ESLint configuration
+- React 18
+- TypeScript (strict mode)
+- React Router
+- @tanstack/react-query — работа с серверным состоянием
+- Zustand — хранение клиентского состояния (сортировка)
+- Tailwind CSS — стилизация
+- react-hot-toast — уведомления
+- DummyJSON API — источник данных
+- Eslint, Prettier - стандартизация кода
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Обоснование выбора инструментов
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+React Query используется для управления server state:
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- кэширование данных
+- управление загрузкой (`isLoading`, `isFetching`)
+- повторные запросы
+- удобная работа с ошибками
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Zustand выбран для хранения состояния сортировки:
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- лёгкий и минималистичный state manager
+- отсутствие boilerplate
+- удобное хранение глобального UI-состояния
+- изоляция client state от server state
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+---
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Авторизация
+
+Используется DummyJSON Auth API.
+
+### Реализовано:
+
+- Валидация обязательных полей
+- Отображение ошибок API под полями формы
+- Поддержка логики "Запомнить меня"
+
+### Логика хранения токена
+
+Если чекбокс установлен:
+
+- токен сохраняется в `localStorage`
+- сессия сохраняется после закрытия браузера
+
+Если чекбокс не установлен:
+
+- токен сохраняется в `sessionStorage`
+- сессия сбрасывается при закрытии вкладки
+
+---
+
+## Список товаров
+
+Источник данных: DummyJSON Products API.
+
+### Реализовано:
+
+- Загрузка списка товаров
+- Соответствие столбцам из макета Figma
+- Прогресс-бар при подгрузке
+- Сортировка по столбцам (например, цена, рейтинг)
+- Состояние сортировки хранится в Zustand
+- Поиск товаров через API
+- Подсветка рейтинга < 3 красным цветом
+- Пагинация с ограниченным числом кнопок
+
+### Поведение загрузки
+
+- `isLoading` — отображается экран загрузки при первом запросе
+- `isFetching` — отображается прогресс-бар при фоновой загрузке данных
+
+---
+
+## Поиск товаров
+
+- Используется API DummyJSON
+- Применяется debounce для уменьшения количества запросов
+- При изменении строки поиска страница сбрасывается на первую
+
+---
+
+## Сортировка
+
+- Сортировка по выбранным столбцам
+- Состояние сортировки хранится в Zustand
+- Сортировка сохраняется при переходе между страницами
+
+---
+
+## Добавление товара
+
+По нажатию кнопки "Добавить":
+
+- Открывается модальное окно
+- Валидация обязательных полей:
+  - Наименование
+  - Цена
+  - Вендор
+  - Артикул
+- При успешном добавлении:
+  - Показывается Toast-уведомление
+  - Товар добавляется локально (без отправки на API)
+
+Сохранение через API согласно требованиям не реализуется.
+
+---
+
+## Дизайн
+
+Интерфейс реализован в соответствии с макетом Figma.
+
+Ссылка:
+https://drive.google.com/file/d/1_AlUzuPv7tHzd1Ri13lFICv2We24xGpm/view?usp=sharing
+
+Реализовано:
+
+- Сетка и отступы
+- Стабильная ширина таблицы (`table-layout: fixed`)
+- Прогресс-индикация
+- Корректное поведение пагинации
+
+---
+
+## Архитектура проекта
+
+Используется feature-based структура:
+
+src/
+features/
+auth/
+products/
+api/
+hooks/
+components/
+shared/
+ui/
+api/
+
+Принципы:
+
+- API-слой отделён от UI
+- Server state (React Query) отделён от Client state (Zustand)
+- Чистое разделение ответственности
+
+---
+
+## UX-детали
+
+- Таблица не "скачет" благодаря фиксированной ширине колонок
+- Прогресс-бар отображается при фоновой загрузке
+- Debounce при поиске
+- Toast уведомления глобально через `<Toaster />`
+- Обработка ошибок API
+
+---
+
+## Запуск проекта
+
+npm install  
+npm run dev
+
+Открыть в Google Chrome.
+
+---
+
+## Использование ИИ
+
+При выполнении задания использовалась модель:
+
+ChatGPT, Gemini3, Grok
+
+ИИ применялся для:
+
+- оптимизации архитектуры
+- решения проблем с React hooks
+- корректной интеграции debounce
+- настройки React Query
+- улучшения UX
+- формирования документации
+
+Код адаптирован и структурирован вручную.
+
+---
+
+## Итог
+
+Проект соответствует требованиям:
+
+- React 18+
+- TypeScript strict
+- Работает в актуальной версии Chrome
+- Интеграция с DummyJSON API
+- Авторизация
+- Сортировка
+- Поиск
+- Прогресс-бар
+- Добавление товара
+- Toast уведомления
+- Корректная логика хранения сессии

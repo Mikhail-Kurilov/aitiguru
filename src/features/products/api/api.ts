@@ -7,10 +7,10 @@ interface GetProductsParams {
 }
 
 export const getProducts = async ({
-                                    page,
-                                    limit,
-                                    search,
-                                  }: GetProductsParams): Promise<ProductsResponse> => {
+  page,
+  limit,
+  search,
+}: GetProductsParams): Promise<ProductsResponse> => {
   const skip = (page - 1) * limit;
   const url = search
     ? `https://dummyjson.com/products/search?q=${search}&limit=${limit}&skip=${skip}`

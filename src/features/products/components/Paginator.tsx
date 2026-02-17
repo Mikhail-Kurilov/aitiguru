@@ -8,11 +8,11 @@ interface Props {
 }
 
 const Paginator: React.FC<Props> = ({
-                                      total,
-                                      currentPage,
-                                      limit,
-                                      onPageChange,
-                                    }) => {
+  total,
+  currentPage,
+  limit,
+  onPageChange,
+}) => {
   const totalPages = Math.ceil(total / limit);
 
   const maxVisible = 5;
@@ -35,8 +35,7 @@ const Paginator: React.FC<Props> = ({
     <div className="flex justify-between items-center mt-6">
       <div>
         <span className="text-gray-500">Показано</span>{" "}
-        {(currentPage - 1) * limit + 1}-
-        {Math.min(currentPage * limit, total)}{" "}
+        {(currentPage - 1) * limit + 1}-{Math.min(currentPage * limit, total)}{" "}
         <span className="text-gray-500">из</span> {total}
       </div>
 
@@ -49,14 +48,12 @@ const Paginator: React.FC<Props> = ({
           <MdKeyboardArrowLeft />
         </button>
 
-        {pages.map(page => (
+        {pages.map((page) => (
           <button
             key={page}
             onClick={() => onPageChange(page)}
             className={`px-3 py-1 rounded ${
-              currentPage === page
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200"
+              currentPage === page ? "bg-blue-600 text-white" : "bg-gray-200"
             }`}
           >
             {page}

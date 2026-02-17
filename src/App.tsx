@@ -1,22 +1,23 @@
-import './App.css'
-import {Route, Routes} from "react-router-dom";
+import "./App.css";
+import { Route, Routes } from "react-router-dom";
 import routes from "./constants/routes.tsx";
-import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import {Suspense, useEffect} from "react";
-import {refreshAccessToken, saveTokens} from "./features/login/auth/auth.ts";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Suspense, useEffect } from "react";
+import { refreshAccessToken, saveTokens } from "./features/login/auth/auth.ts";
 import Loading from "./ui/Loading.tsx";
+import { Toaster } from "react-hot-toast";
 
 function App() {
-const queryClient = new QueryClient();
+  const queryClient = new QueryClient();
 
   useEffect(() => {
     const tryRefresh = async () => {
       try {
         const data = await refreshAccessToken();
         saveTokens(data.accessToken, data.refreshToken);
-        console.log('Session restored');
+        console.log("Session restored");
       } catch {
-        console.log('User not authenticated');
+        console.log("User not authenticated");
       }
     };
 
@@ -27,15 +28,16 @@ const queryClient = new QueryClient();
     <main className=" flex flex-grow pt-2 px-4 text-gray-800 rounded shadow-md mx-auto min-w-fit">
       <QueryClientProvider client={queryClient}>
         <Suspense fallback={<Loading />}>
+          <Toaster position="top-center" />
           <Routes>
             {routes.map((route, index) => (
-              <Route key={index} path={route.path} element={route.element}/>
+              <Route key={index} path={route.path} element={route.element} />
             ))}
           </Routes>
         </Suspense>
       </QueryClientProvider>
     </main>
-  )
+  );
 }
 
-export default App
+export default App;

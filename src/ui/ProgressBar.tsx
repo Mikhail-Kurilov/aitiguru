@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 
 export const ProgressBar = ({ isActive }: { isActive: boolean }) => {
   const [progress, setProgress] = useState(0);
@@ -40,4 +40,4 @@ export const ProgressBar = ({ isActive }: { isActive: boolean }) => {
       />
     </div>
   );
-}
+};

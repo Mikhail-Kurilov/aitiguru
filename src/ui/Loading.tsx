@@ -13,15 +13,17 @@ const sizeClasses = {
 };
 
 const Loading: React.FC<LoadingProps> = ({
-                                           size = "md",
-                                           color = "border-blue-500",
-                                           className = "",
-                                         }) => {
+  size = "md",
+  color = "border-blue-500",
+  className = "",
+}) => {
   const spinnerSize = sizeClasses[size];
 
   return (
     <div className={`flex items-center justify-center ${className}`}>
-      <div className={`animate-spin rounded-full ${spinnerSize} border-t-transparent ${color}`} />
+      <div
+        className={`animate-spin rounded-full ${spinnerSize} border-t-transparent ${color}`}
+      />
     </div>
   );
 };
